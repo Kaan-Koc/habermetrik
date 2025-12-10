@@ -4,52 +4,41 @@ Habermetre - Haber Gruplama (Clustering) Modülü
 BERT embeddings kullanarak Türkçe haberleri anlamsal olarak gruplar.
 """
 
-from sentence_transformers import SentenceTransformer
+
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import DBSCAN
 from collections import Counter
-import numpy as np
 import re
-
+import numpy as np
 
 class NewsClusterer:
-    """Haber gruplama sınıfı"""
+    """Haber gruplama sınıfı (TF-IDF Lightweight Sürümü)"""
     
-    def __init__(self, model_name='paraphrase-multilingual-MiniLM-L12-v2'):
+    def __init__(self, model_name=None):
         """
         Args:
-            model_name: Sentence transformer model adı
+            model_name: Geriye uyumluluk için tutuldu (kullanılmıyor)
         """
-        print(f"📥 BERT modeli yükleniyor: {model_name}")
-        self.model = SentenceTransformer(model_name)
-        print(f"✅ Model yüklendi ({self.model.get_sentence_embedding_dimension()} boyutlu vektörler)")
+        print("📥 TF-IDF Vektörleştirici ile başlatılıyor (Lightweight Mode)")
+        self.vectorizer = TfidfVectorizer(
+            stop_words=None, # Türkçe stop words aşağıda manuel temizleniyor
+            max_features=5000,
+            ngram_range=(1, 2)
+        )
     
     def extract_keywords(self, text, top_n=3):
-        """
-        Metinden anahtar kelimeleri çıkar
-        
-        Args:
-            text: Metin
-            top_n: Kaç kelime
-            
-        Returns:
-            En sık kullanılan kelimeler
-        """
-        # Türkçe stopwords (durdurulması gereken kelimeler)
+        """Metinden anahtar kelimeleri çıkar"""
         stopwords = {
             've', 'veya', 'ile', 'ama', 'fakat', 'ancak', 'için', 'gibi', 
             'bir', 'bu', 'şu', 'o', 'ne', 'nasıl', 'neden', 'niçin',
             'mi', 'mı', 'mu', 'mü', 'de', 'da', 'ki', 'dı', 'di',
             'var', 'yok', 'olan', 'oldu', 'olacak', 'etti', 'ediyor',
-            'den', 'dan', 'ten', 'tan', 'e', 'a', 'ye', 'ya'
+            'den', 'dan', 'ten', 'tan', 'e', 'a', 'ye', 'ya', 'ile'
         }
         
-        # Küçük harfe çevir ve sadece harfleri al
         words = re.findall(r'\b\w+\b', text.lower())
-        
-        # Stopwords ve kısa kelimeleri filtrele
         filtered = [w for w in words if w not in stopwords and len(w) > 2]
         
-        # En sık kullanılanları bul
         if not filtered:
             return []
         
@@ -57,19 +46,8 @@ class NewsClusterer:
         return [word for word, _ in counter.most_common(top_n)]
     
     def generate_cluster_title(self, news_items):
-        """
-        Küme için otomatik başlık oluştur
-        
-        Args:
-            news_items: Kümedeki haberler
-            
-        Returns:
-            Küme başlığı
-        """
-        # Tüm başlıkları birleştir
+        """Küme için otomatik başlık oluştur"""
         all_text = ' '.join([item['title'] for item in news_items])
-        
-        # En sık kullanılan 2-3 kelimeyi al
         keywords = self.extract_keywords(all_text, top_n=3)
         
         if keywords:
@@ -77,82 +55,73 @@ class NewsClusterer:
         else:
             return news_items[0]['title'][:50] + '...'
     
-    def cluster_news(self, news_items, eps=0.35, min_samples=2):
-        """
-        Haberleri kümelere ayır
-        
-        Args:
-            news_items: Haber listesi (dict'ler)
-            eps: DBSCAN epsilon parametresi (0-1, düşük = sıkı gruplama)
-            min_samples: Minimum haber sayısı
-            
-        Returns:
-            {
-                cluster_id: {
-                    'title': 'Küme Başlığı',
-                    'count': 5,
-                    'news': [...]
-                }
-            }
-        """
+    def cluster_news(self, news_items, eps=0.4, min_samples=2):
+        """Haberleri kümelere ayır (TF-IDF + DBSCAN)"""
         if not news_items:
             return {}
         
-        # Başlıkları al
         titles = [item['title'] for item in news_items]
         
-        print(f"🔍 {len(titles)} haber için embedding hesaplanıyor...")
+        print(f"🔍 {len(titles)} haber için TF-IDF hesaplanıyor...")
         
-        # Embedding'lere çevir
-        embeddings = self.model.encode(titles, show_progress_bar=False)
-        
-        print(f"📊 Clustering yapılıyor (eps={eps}, min_samples={min_samples})...")
-        
-        # DBSCAN clustering (cosine distance kullan)
-        clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='cosine')
-        labels = clustering.fit_predict(embeddings)
-        
-        # Kümeleri oluştur
-        clusters = {}
-        for idx, label in enumerate(labels):
-            # -1 = noise (kümeye girmeyen)
-            if label == -1:
-                # Tek başına haberler için ayrı kümeler oluştur
-                label = f"single_{idx}"
+        # TF-IDF Matrisi oluştur
+        try:
+            tfidf_matrix = self.vectorizer.fit_transform(titles)
             
-            if label not in clusters:
-                clusters[label] = []
+            # DBSCAN (Cosine Similarity = 1 - Cosine Distance)
+            # sklearn DBSCAN varsayılan olarak euclidean kullanır. 
+            # TF-IDF l2 normalize olduğu için euclidean ~ cosine distance davranır.
+            # Ancak biz yine de 'cosine' metriğini kullanalım daha doğru sonuç için.
             
-            clusters[label].append(news_items[idx])
-        
-        print(f"✅ {len(clusters)} küme oluşturuldu")
-        
-        # Her küme için başlık oluştur
-        result = {}
-        for cluster_id, items in clusters.items():
-            result[cluster_id] = {
-                'id': cluster_id,
-                'title': self.generate_cluster_title(items),
-                'count': len(items),
-                'news': sorted(items, key=lambda x: x.get('pub_date') or '', reverse=True)
-            }
-        
-        # Kümeleri haber sayısına göre sırala
-        sorted_clusters = dict(sorted(
-            result.items(), 
-            key=lambda x: x[1]['count'], 
-            reverse=True
-        ))
-        
-        return sorted_clusters
+            print(f"📊 Clustering yapılıyor (eps={eps}, min_samples={min_samples})...")
+            
+            clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='cosine', algorithm='brute')
+            labels = clustering.fit_predict(tfidf_matrix) # Sparse matrix destekler
+            
+            # Kümeleri oluştur
+            clusters = {}
+            for idx, label in enumerate(labels):
+                if label == -1: # Noise
+                    label = f"single_{idx}"
+                else:
+                    label = str(label) # JSON uyumluluğu için string
+                
+                if label not in clusters:
+                    clusters[label] = []
+                
+                clusters[label].append(news_items[idx])
+            
+            print(f"✅ {len(clusters)} küme oluşturuldu")
+            
+            # Sonuçları hazırla
+            result = {}
+            for cluster_id, items in clusters.items():
+                result[cluster_id] = {
+                    'id': cluster_id,
+                    'title': self.generate_cluster_title(items),
+                    'count': len(items),
+                    'news': sorted(items, key=lambda x: x.get('pub_date') or '', reverse=True)
+                }
+            
+            # Sırala
+            sorted_clusters = dict(sorted(
+                result.items(), 
+                key=lambda x: x[1]['count'], 
+                reverse=True
+            ))
+            
+            return sorted_clusters
 
+        except ValueError:
+            # Boş veri vb. durumlarda
+            return {}
 
 # Global singleton
 _clusterer = None
 
 def get_clusterer():
-    """Global clusterer instance"""
     global _clusterer
     if _clusterer is None:
         _clusterer = NewsClusterer()
     return _clusterer
+

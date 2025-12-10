@@ -1,6 +1,5 @@
 Flask
 requests
-sentence-transformers
 scikit-learn
 numpy
 gunicorn
