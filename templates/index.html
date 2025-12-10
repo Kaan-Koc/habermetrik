@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arama - HaberMetrik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #b91c1c;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-box h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+            text-align: center;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 18px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            padding: 18px 40px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        #results {
+            margin-top: 30px;
+        }
+
+        .news-item {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: 0.2s;
+        }
+
+        .news-item:hover {
+            background: #eef2ff;
+            transform: translateX(5px);
+        }
+
+        .news-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .news-title a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .news-title a:hover {
+            color: #667eea;
+        }
+
+        .news-meta {
+            color: #999;
+            font-size: 14px;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 101;
+        }
+
+        @media (max-width: 900px) {
+            .header-content {
+                padding: 0 20px;
+                position: relative;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .logo-text h1 {
+                font-size: 20px;
+            }
+
+            .logo-text p {
+                font-size: 11px;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                width: 250px;
+                background: #1e3a8a;
+                flex-direction: column;
+                padding: 10px;
+                gap: 5px;
+                box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.3);
+                border-radius: 0 0 0 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-top: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                color: #e2e8f0;
+                width: 100%;
+                text-align: left;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+            .nav-links a:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links span {
+                display: none;
+                /* Hide username on mobile to save space */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="/search-grouped" class="logo">
+                <div class="logo-icon">📰</div>
+                <div class="logo-text">
+                    <h1>HaberMetrik</h1>
+                    <p>AI-Powered News Aggregation</p>
+                </div>
+            </a>
+            <div class="mobile-menu-btn" onclick="toggleMenu()">&#8942;</div>
+            <div class="nav-links">
+                <span style="color: #cbd5e1;">{{ user.username }}</span>
+                <a href="/sanal-gazete">📰 Sanal Gazetem</a>
+                <a href="/canli-akis">🔴 Canlı Akış</a>
+                <a href="/search-grouped">🔍 AI Arama</a>
+                <a href="/depremler">🌍 Son Depremler</a>
+                {% if user.role == 'admin' %}
+                <a href="/dashboard">📊 Dashboard</a>
+                <a href="/admin" style="color: #ef4444;">🛡️ Admin</a>
+                {% endif %}
+                <a href="/logout" style="color: #ef4444;">Çıkış</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-box">
+            <h2>🔍 Haber Ara</h2>
+            <div class="search-input-group">
+                <input type="text" id="searchInput" placeholder="Anahtar kelime girin..." autofocus>
+                <button onclick="search()">Ara</button>
+            </div>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            const navLinks = document.querySelector('.nav-links');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+
+            if (!navLinks.contains(e.target) && !menuBtn.contains(e.target) && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') search();
+        });
+
+        async function search() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p style="text-align:center;color:#666;">Aranıyor...</p>';
+
+            try {
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.count === 0) {
+                    resultsDiv.innerHTML = '<p style="text-align:center;color:#666;">Sonuç bulunamadı</p>';
+                    return;
+                }
+
+                let html = `<p style="margin-bottom:20px;color:#666;">${data.count} sonuç bulundu</p>`;
+                data.results.forEach(item => {
+                    html += `
+                        <div class="news-item">
+                            <div class="news-title">
+                                <a href="${item.link}" target="_blank">${item.title}</a>
+                            </div>
+                            <div class="news-meta">
+                                <span>📰 ${item.source}</span>
+                                <span>📅 ${item.pub_date || 'Tarih yok'}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                resultsDiv.innerHTML = html;
+            } catch (err) {
+                resultsDiv.innerHTML = '<p style="text-align:center;color:#ef4444;">Hata oluştu</p>';
+            }
+        }
+    </script>
+</body>
+
+</html>

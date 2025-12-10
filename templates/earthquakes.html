@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Son Depremler - HaberMetrik</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1001;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 40px auto;
+            padding: 0 30px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: #b91c1c;
+            /* Daha açık Bordo/Kırmızı */
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(185, 28, 28, 0.3);
+        }
+
+        .page-subtitle {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .earthquake-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1200px) {
+            .earthquake-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #map {
+            height: 600px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #1e293b;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .earthquake-list {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .list-title {
+            color: #1e293b;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .earthquake-item {
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+            border: 1px solid #e2e8f0;
+            border-left-width: 4px;
+            /* Restore left border width */
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+
+        .earthquake-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+        }
+
+        .earthquake-item.magnitude-high {
+            border-left-color: #ef4444;
+        }
+
+        .earthquake-item.magnitude-medium {
+            border-left-color: #f59e0b;
+        }
+
+        .earthquake-item.magnitude-low {
+            border-left-color: #10b981;
+        }
+
+        .eq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .eq-magnitude {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .magnitude-high .eq-magnitude {
+            color: #ef4444;
+        }
+
+        .magnitude-medium .eq-magnitude {
+            color: #f59e0b;
+        }
+
+        .magnitude-low .eq-magnitude {
+            color: #10b981;
+        }
+
+        .eq-time {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .eq-location {
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .eq-details {
+            display: flex;
+            gap: 20px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .eq-source {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-text {
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 101;
+        }
+
+        @media (max-width: 900px) {
+            .header-content {
+                padding: 0 20px;
+                position: relative;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .logo-text h1 {
+                font-size: 20px;
+            }
+
+            .logo-text p {
+                font-size: 11px;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                width: 250px;
+                background: #1e3a8a;
+                flex-direction: column;
+                padding: 10px;
+                gap: 5px;
+                box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.3);
+                border-radius: 0 0 0 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-top: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                color: #e2e8f0;
+                width: 100%;
+                text-align: left;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+            .nav-links a:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links span {
+                display: none;
+                /* Hide username on mobile to save space */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <div class="header">
+        <div class="header-content">
+            <a href="/search-grouped" class="logo">
+                <div class="logo-icon">📰</div>
+                <div class="logo-text">
+                    <h1>HaberMetrik</h1>
+                    <p>AI-Powered News Aggregation</p>
+                </div>
+            </a>
+            <div class="mobile-menu-btn" onclick="toggleMenu()">&#8942;</div>
+            <div class="nav-links">
+                <span style="color: #cbd5e1;">{{ user.username }}</span>
+                <a href="/sanal-gazete">📰 Sanal Gazetem</a>
+                <a href="/canli-akis">🔴 Canlı Akış</a>
+                <a href="/search-grouped">🔍 AI Arama</a>
+                <a href="/depremler" style="color: #fff; background: rgba(239, 68, 68, 0.2);">🌍 Son Depremler</a>
+                {% if user.role == 'admin' %}
+                <a href="/dashboard">📊 Dashboard</a>
+                <a href="/admin" style="color: #ef4444;">🛡️ Admin</a>
+                {% endif %}
+                <a href="/logout" style="color: #ef4444;">Çıkış</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🌍 Son Depremler</h1>
+            <p class="page-subtitle">Kandilli Rasathanesi ve AFAD Verileri • Canlı Güncel</p>
+        </div>
+
+        <div class="earthquake-grid">
+            <div>
+                <div id="map"></div>
+            </div>
+
+            <div class="stats-panel">
+                <h3 style="color: #1e293b; margin-bottom: 20px;">📊 İstatistikler</h3>
+                <div class="stat-card">
+                    <div class="stat-label">Toplam Deprem</div>
+                    <div class="stat-value" id="total-count">{{ earthquakes|length }}</div>
+                </div>
+                <div class="stat-card"
+                    style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                    <div class="stat-label">Büyük (M ≥ 4.0)</div>
+                    <div class="stat-value" style="color: #ef4444;" id="high-count">0</div>
+                </div>
+                <div class="stat-card"
+                    style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
+                    <div class="stat-label">Orta (3.0 ≤ M < 4.0)</div>
+                            <div class="stat-value" style="color: #f59e0b;" id="medium-count">0</div>
+                    </div>
+                    <div class="stat-card"
+                        style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2);">
+                        <div class="stat-label">Küçük (M < 3.0)</div>
+                                <div class="stat-value" style="color: #10b981;" id="low-count">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="earthquake-list">
+                    <div class="list-header">
+                        <h2 class="list-title">📋 Deprem Listesi</h2>
+                        <select class="filter-select" id="magnitude-filter">
+                            <option value="all">Tüm Depremler</option>
+                            <option value="high">Büyük (M ≥ 4.0)</option>
+                            <option value="medium">Orta (3.0 ≤ M < 4.0)</option>
+                            <option value="low">Küçük (M < 3.0)</option>
+                        </select>
+                    </div>
+
+                    <div id="earthquake-items">
+                        {% for eq in earthquakes %}
+                        <div class="earthquake-item {% if eq.magnitude >= 4.0 %}magnitude-high{% elif eq.magnitude >= 3.0 %}magnitude-medium{% else %}magnitude-low{% endif %}"
+                            data-magnitude="{{ eq.magnitude }}" data-lat="{{ eq.latitude }}"
+                            data-lon="{{ eq.longitude }}">
+                            <div class="eq-header">
+                                <div class="eq-magnitude">M{{ eq.magnitude }}</div>
+                                <div class="eq-time">{{ eq.time_formatted }}</div>
+                            </div>
+                            <div class="eq-location">{{ eq.location }}</div>
+                            <div class="eq-details">
+                                <span class="eq-source">{{ eq.source }}</span>
+                                <span>📍 {{ eq.latitude }}°, {{ eq.longitude }}°</span>
+                                <span>⬇️ {{ eq.depth }} km</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ef4444;"></div>
+                        <span class="legend-text">Büyük (M ≥ 4.0)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <span class="legend-text">Orta (3.0 ≤ M < 4.0)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <span class="legend-text">Küçük (M < 3.0)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Veriyi gizli bir elementte tut (IDE hatalarını engellemek için) -->
+        <div id="earthquake-data" data-earthquakes='{{ earthquakes| tojson | safe }}' style="display: none;"></div>
+
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            // Mobile Menu Toggle
+            function toggleMenu() {
+                document.querySelector('.nav-links').classList.toggle('active');
+            }
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function (e) {
+                const navLinks = document.querySelector('.nav-links');
+                const menuBtn = document.querySelector('.mobile-menu-btn');
+
+                if (!navLinks.contains(e.target) && !menuBtn.contains(e.target) && navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                }
+            });
+
+            // Harita oluştur
+            const map = L.map('map').setView([39.0, 35.0], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Deprem verileri (HTML'den oku)
+            const dataElement = document.getElementById('earthquake-data');
+            const earthquakeData = JSON.parse(dataElement.dataset.earthquakes);
+
+            // İstatistikleri hesapla
+            let high = 0, medium = 0, low = 0;
+            earthquakeData.forEach(eq => {
+                if (eq.magnitude >= 4.0) high++;
+                else if (eq.magnitude >= 3.0) medium++;
+                else low++;
+            });
+
+            document.getElementById('high-count').textContent = high;
+            document.getElementById('medium-count').textContent = medium;
+            document.getElementById('low-count').textContent = low;
+
+            // Haritaya marker'ları ekle
+            earthquakeData.forEach(eq => {
+                const color = eq.magnitude >= 4.0 ? '#ef4444' : eq.magnitude >= 3.0 ? '#f59e0b' : '#10b981';
+                const radius = Math.min(eq.magnitude * 3, 15);
+
+                const circle = L.circleMarker([eq.latitude, eq.longitude], {
+                    radius: radius,
+                    fillColor: color,
+                    color: color,
+                    weight: 2,
+                    opacity: 0.8,
+                    fillOpacity: 0.6
+                }).addTo(map);
+
+                circle.bindPopup(`
+                <div style="min-width: 200px;">
+                    <h3 style="margin: 0 0 10px 0; color: ${color};">M${eq.magnitude}</h3>
+                    <p style="margin: 5px 0;"><strong>${eq.location}</strong></p>
+                    <p style="margin: 5px 0; font-size: 12px;">${eq.time_formatted}</p>
+                    <p style="margin: 5px 0; font-size: 12px;">Derinlik: ${eq.depth} km</p>
+                    <p style="margin: 5px 0; font-size: 11px; color: #666;">${eq.source}</p>
+                </div>
+            `);
+            });
+
+            // Filtreleme
+            document.getElementById('magnitude-filter').addEventListener('change', function () {
+                const items = document.querySelectorAll('.earthquake-item');
+                const filter = this.value;
+
+                items.forEach(item => {
+                    const magnitude = parseFloat(item.dataset.magnitude);
+                    let show = true;
+
+                    if (filter === 'high' && magnitude < 4.0) show = false;
+                    if (filter === 'medium' && (magnitude < 3.0 || magnitude >= 4.0)) show = false;
+                    if (filter === 'low' && magnitude >= 3.0) show = false;
+
+                    item.style.display = show ? 'block' : 'none';
+                });
+            });
+
+            // Deprem item'ine tıklanınca haritada göster
+            document.querySelectorAll('.earthquake-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const lat = parseFloat(this.dataset.lat);
+                    const lon = parseFloat(this.dataset.lon);
+                    map.setView([lat, lon], 10);
+                });
+            });
+        </script>
+</body>
+
+</html>

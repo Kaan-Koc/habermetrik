@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HaberMetrik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 101;
+        }
+
+        @media (max-width: 900px) {
+            .header-content {
+                padding: 0 20px;
+                position: relative;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .logo-text h1 {
+                font-size: 20px;
+            }
+
+            .logo-text p {
+                font-size: 11px;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                width: 250px;
+                background: #1e3a8a;
+                flex-direction: column;
+                padding: 10px;
+                gap: 5px;
+                box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.3);
+                border-radius: 0 0 0 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-top: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                color: #e2e8f0;
+                width: 100%;
+                text-align: left;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+            .nav-links a:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links span {
+                display: none;
+                /* Hide username on mobile to save space */
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 40px auto;
+            padding: 0 30px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 1400px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 30px;
+            border-radius: 20px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .stat-card.green::before {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+        }
+
+        .stat-card.green .stat-number {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card.red::before {
+            background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+        }
+
+        .stat-card.red .stat-number {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .section-subtitle {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Trending Topics */
+
+
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .trending-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 30px;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .trending-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .trending-card:hover::before {
+            opacity: 1;
+        }
+
+        .trending-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            background: #253550;
+        }
+
+        .trending-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .trending-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+            flex: 1;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+        }
+
+        .trending-stats {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+        }
+
+        .trending-keywords {
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-bottom: 20px;
+            padding: 12px 18px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            border-left: 3px solid #3b82f6;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trending-keywords::before {
+            content: '🔑';
+            font-size: 16px;
+        }
+
+        .trending-article-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .trending-article-item:hover {
+            padding-left: 8px;
+        }
+
+        .trending-article-item:last-child {
+            border-bottom: none;
+        }
+
+        .article-source {
+            display: inline-block;
+            background: rgba(124, 58, 237, 0.15);
+            color: #7c3aed;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            white-space: nowrap;
+        }
+
+        .article-title {
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .more-articles-hint {
+            display: block;
+            color: #60a5fa;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 15px;
+            text-align: center;
+            padding: 10px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 10px;
+            border: 1px dashed rgba(59, 130, 246, 0.3);
+            transition: all 0.2s;
+        }
+
+        .more-articles-hint:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        /* Sources Section */
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .source-badge {
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .source-badge span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .source-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .source-badge.working {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .source-badge.failed {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .source-badge.working .status-dot {
+            background: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .source-badge.failed .status-dot {
+            background: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Top Sources */
+        .top-sources {
+            background: #334155;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 35px;
+            border: 2px solid #3b82f6;
+        }
+
+        .source-bar {
+            margin-bottom: 5px;
+            background: #1e293b;
+            padding: 2px;
+            border-radius: 6px;
+        }
+
+        .source-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+            padding: 0 4px;
+        }
+
+        .source-bar-label strong {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .source-bar-label span:last-child {
+            color: #666;
+        }
+
+        .source-bar-graph {
+            height: 35px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .source-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 10px;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px;
+            font-size: 18px;
+            color: #64748b;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: #1e293b;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid #334155;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            color: #f1f5f9;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .modal-close {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .show-more-btn {
+            background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+            margin-top: 15px;
+        }
+
+        .show-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+        }
+
+        .sources-grid-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+
+
+        /* NEW RESPONSIVE DASHBOARD CLASSES */
+        .dashboard-dual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .flow-rate-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .sentiment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .dashboard-card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #334155;
+        }
+
+        .card-header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 900px) {
+            .dashboard-dual-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .sources-grid-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #flow-rate-content {
+                grid-template-columns: 1fr !important;
+                /* Stack widgets vertically */
+            }
+
+            .sentiment-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            /* Center chart on mobile */
+            .sentiment-grid>div:first-child {
+                display: flex;
+                justify-content: center;
+            }
+
+            .dashboard-card {
+                padding: 20px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            /* Make trending grid swipeable or single col */
+            .trending-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+
+    <!-- Chart.js for time series visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="/search-grouped" class="logo" style="text-decoration: none;">
+                <div class="logo-icon">📰</div>
+                <div class="logo-text">
+                    <h1>HaberMetrik</h1>
+                    <p>AI-Powered News Aggregation</p>
+                </div>
+            </a>
+            <div class="mobile-menu-btn" onclick="toggleMenu()">&#8942;</div>
+            <div class="nav-links">
+                <span style="color: #cbd5e1;">{{ user.username }}</span>
+                <a href="/sanal-gazete">📰 Sanal Gazetem</a>
+                <a href="/canli-akis">🔴 Canlı Akış</a>
+                <a href="/search-grouped">🔍 AI Arama</a>
+                <a href="/depremler">🌍 Son Depremler</a>
+                {% if user.role == 'admin' %}
+                <a href="/dashboard" style="color: #fff; background: rgba(59, 130, 246, 0.2);">📊 Dashboard</a>
+                <a href="/admin" style="color: #ef4444;">🛡️ Admin</a>
+                {% endif %}
+                <a href="/logout" style="color: #ef4444;">Çıkış</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <script>
+            // Mobile Menu Toggle
+            function toggleMenu() {
+                document.querySelector('.nav-links').classList.toggle('active');
+            }
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function (e) {
+                const navLinks = document.querySelector('.nav-links');
+                const menuBtn = document.querySelector('.mobile-menu-btn');
+
+                if (!navLinks.contains(e.target) && !menuBtn.contains(e.target) && navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                }
+            });
+        </script>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Dashboard yükleniyor...</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div id="stats" class="stats-grid" style="display: none;"></div>
+
+        <!-- NEW: News Flow Rate & Comparison Widgets (Side by Side) -->
+        <div class="dashboard-dual-grid">
+            <!-- News Flow Rate -->
+            <div class="dashboard-card">
+                <h3 class="card-header-title">
+                    ⚡ Haber Akış Hızı
+                </h3>
+                <div id="flow-rate-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div
+                        style="text-align: center; padding: 20px; background: #1e293b; border-radius: 15px; border: 1px solid #334155;">
+                        <div id="news-per-minute"
+                            style="font-size: 32px; font-weight: 800; color: #60a5fa; margin-bottom: 5px;">-</div>
+                        <div style="font-size: 12px; color: #94a3b8;">Haber/Dakika</div>
+                    </div>
+                    <div
+                        style="text-align: center; padding: 20px; background: #1e293b; border-radius: 15px; border: 1px solid #334155;">
+                        <div id="news-per-hour"
+                            style="font-size: 32px; font-weight: 800; color: #a78bfa; margin-bottom: 5px;">-</div>
+                        <div style="font-size: 12px; color: #94a3b8;">Haber/Saat</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today vs Yesterday Comparison -->
+            <div class="dashboard-card">
+                <h3 class="card-header-title">
+                    📊 Bugün vs Dün
+                </h3>
+                <div id="comparison-content" class="comparison-grid">
+                    <div
+                        style="text-align: center; padding: 20px; background: #1e293b; border-radius: 15px; border: 1px solid #334155;">
+                        <div id="today-count"
+                            style="font-size: 32px; font-weight: 800; color: #22c55e; margin-bottom: 5px;">0</div>
+                        <div style="font-size: 12px; color: #94a3b8;">Bugün</div>
+                    </div>
+                    <div
+                        style="text-align: center; padding: 20px; background: #1e293b; border-radius: 15px; border: 1px solid #334155;">
+                        <div id="yesterday-count"
+                            style="font-size: 32px; font-weight: 800; color: #94a3b8; margin-bottom: 5px;">0</div>
+                        <div style="font-size: 12px; color: #94a3b8;">Dün</div>
+                    </div>
+                    <div
+                        style="text-align: center; padding: 20px; background: #1e293b; border-radius: 15px; border: 1px solid #334155;">
+                        <div id="change-percent"
+                            style="font-size: 32px; font-weight: 800; color: #3b82f6; margin-bottom: 5px;">0%</div>
+                        <div style="font-size: 12px; color: #94a3b8;">Değişim</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Time Series Chart -->
+        <!-- NEW: Time Series Chart -->
+        <div class="dashboard-card" style="margin-bottom: 35px;">
+            <h3 class="card-header-title">
+                📈 Son 24 Saatin Haber Dağılımı
+            </h3>
+            <canvas id="timeSeriesChart" style="max-height: 300px;"></canvas>
+        </div>
+
+        <!-- NEW: Live Feed & Word Cloud (Side by Side) -->
+        <div class="dashboard-dual-grid">
+            <!-- Live News Feed -->
+            <div class="dashboard-card">
+                <h3 class="card-header-title">
+                    🔴 Canlı Haber Akışı
+                    <span
+                        style="font-size: 10px; background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 3px 8px; border-radius: 8px; font-weight: 600;">LIVE</span>
+                </h3>
+                <div id="live-feed" style="max-height: 400px; overflow-y: auto;">
+                    <p style="text-align: center; color: #64748b; padding: 20px;">Yükleniyor...</p>
+                </div>
+            </div>
+
+            <!-- Word Cloud -->
+            <div class="dashboard-card">
+                <h3 class="card-header-title">
+                    ☁️ En Sık Kelimeler
+                </h3>
+                <div id="word-cloud"
+                    style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; min-height: 350px;">
+                    <p style="color: #64748b; padding: 20px;">Yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Source Performance Table -->
+        <div class="dashboard-card" style="margin-bottom: 35px;">
+            <h3 class="card-header-title">
+                🏆 Kaynak Performansı (Son 6 Saat)
+            </h3>
+            <div id="source-performance" style="overflow-x: auto;">
+                <p style="text-align: center; color: #64748b; padding: 20px;">Yükleniyor...</p>
+            </div>
+        </div>
+
+        <!-- NEW: Sentiment Analysis -->
+        <div class="dashboard-card" style="margin-bottom: 35px;">
+            <h3 class="card-header-title">
+                😊😐😢 Duygu Analizi (Son 6 Saat)
+            </h3>
+
+            <div class="sentiment-grid">
+                <!-- Chart on left -->
+                <div>
+                    <canvas id="sentimentChart" style="max-height: 300px; width: 100%;"></canvas>
+                </div>
+
+                <!-- Stats cards on right, vertical stack -->
+                <div style="display: flex; flex-direction: column; gap: 18px;">
+                    <!-- Positive -->
+                    <div
+                        style="display: flex; align-items: center; gap: 18px; padding: 18px 22px; background: #1e293b; border-radius: 14px; border: 1px solid #334155;">
+                        <div style="font-size: 44px;">😊</div>
+                        <div style="flex: 1;">
+                            <div
+                                style="font-size: 12px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+                                Pozitif</div>
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <div style="font-size: 32px; font-weight: 800; color: #22c55e;" id="positive-count">0
+                                </div>
+                                <div style="font-size: 13px; color: #64748b; font-weight: 600;" id="positive-percent">0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neutral -->
+                    <div
+                        style="display: flex; align-items: center; gap: 18px; padding: 18px 22px; background: #1e293b; border-radius: 14px; border: 1px solid #334155;">
+                        <div style="font-size: 44px;">😐</div>
+                        <div style="flex: 1;">
+                            <div
+                                style="font-size: 12px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+                                Nötr</div>
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <div style="font-size: 32px; font-weight: 800; color: #94a3b8;" id="neutral-count">0
+                                </div>
+                                <div style="font-size: 13px; color: #64748b; font-weight: 600;" id="neutral-percent">0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Negative -->
+                    <div
+                        style="display: flex; align-items: center; gap: 18px; padding: 18px 22px; background: #1e293b; border-radius: 14px; border: 1px solid #334155;">
+                        <div style="font-size: 44px;">😢</div>
+                        <div style="flex: 1;">
+                            <div
+                                style="font-size: 12px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+                                Negatif</div>
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <div style="font-size: 32px; font-weight: 800; color: #ef4444;" id="negative-count">0
+                                </div>
+                                <div style="font-size: 13px; color: #64748b; font-weight: 600;" id="negative-percent">0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trending Topics (Otomatik Kümeleme) -->
+        <div id="trending-section" class="dashboard-card" style="margin-bottom: 35px;">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🔥 Trending Topics</h2>
+                    <p class="section-subtitle">Son 6 saatin en popüler konuları (Otomatik Kümeleme)</p>
+                </div>
+            </div>
+            <div id="trending-grid" class="trending-grid">
+                <p style="text-align: center; color: #64748b; padding: 40px;">Trending topics yükleniyor...</p>
+            </div>
+        </div>
+
+        <!-- Top Sources Grid (Side by Side) -->
+        <div class="sources-grid-wrapper">
+            <!-- Top Sources Today -->
+            <div id="top-sources" class="dashboard-card" style="display: none;">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">📊 En Çok Haber Toplayan Kaynaklar</h2>
+                        <p class="section-subtitle">Son 6 saatin istatistikleri (aktif toplama)</p>
+                    </div>
+                </div>
+                <div id="top-sources-list"></div>
+                <button class="show-more-btn" onclick="showAllSources()">Daha Fazlasını Göster</button>
+            </div>
+
+            <!-- Top Sources All Time -->
+            <div id="top-sources-all-time" class="dashboard-card" style="display: none;">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">🏆 Tüm Zamanların En Çok Haber Toplayan Kaynakları</h2>
+                        <p class="section-subtitle">Başlangıçtan bugüne toplam istatistikler</p>
+                    </div>
+                </div>
+                <div id="top-sources-all-time-list"></div>
+                <button class="show-more-btn" onclick="showAllSourcesAllTime()">Daha Fazlasını Göster</button>
+            </div>
+        </div>
+
+        <!-- Source Status -->
+        <div id="sources-section" class="dashboard-card" style="display: none; margin-bottom: 35px;">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">📡 Kaynak Durumu</h2>
+                    <p class="section-subtitle">Tüm haber kaynakları (yeşil=çalışıyor, kırmızı=başarısız)</p>
+                </div>
+            </div>
+            <div id="sources-grid" class="sources-grid"></div>
+            <button class="show-more-btn" onclick="showAllSourcesStatus()">Daha Fazlasını Göster</button>
+        </div>
+    </div>
+
+    <!-- Modal for Full Sources List (Last 6 Hours) -->
+    <div id="sourcesModal" class="modal" onclick="closeModal('sourcesModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">📊 Tüm Kaynakların Haber Sayıları (Son 6 Saat)</h2>
+                <div class="modal-close" onclick="closeModal('sourcesModal')">×</div>
+            </div>
+            <div id="modal-sources-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal for All-Time Sources -->
+    <div id="sourcesAllTimeModal" class="modal" onclick="closeModal('sourcesAllTimeModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">🏆 Tüm Zamanların Kaynak İstatistikleri</h2>
+                <div class="modal-close" onclick="closeModal('sourcesAllTimeModal')">×</div>
+            </div>
+            <div id="modal-sources-all-time-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Full Source Status -->
+    <div id="statusModal" class="modal" onclick="closeModal('statusModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">📡 Tüm Kaynakların Durumu</h2>
+                <div class="modal-close" onclick="closeModal('statusModal')">×</div>
+            </div>
+            <div id="modal-status-grid" class="sources-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Trending Topic Details -->
+    <div id="trendingModal" class="modal" onclick="closeModal('trendingModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title" id="trending-modal-title">🔥 Trending Topic</h2>
+                <div class="modal-close" onclick="closeModal('trendingModal')">×</div>
+            </div>
+            <div id="trending-modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let allSourcesData = [];
+        let allSourcesAllTimeData = [];
+        let fullStatusData = {};
+        let allClustersData = [];
+
+        window.addEventListener('load', () => {
+            loadDashboard();
+            // Trending section'ı hemen göster
+            document.getElementById('trending-section').style.display = 'block';
+            loadTrending();
+        });
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showAllSources() {
+            const modal = document.getElementById('sourcesModal');
+            const listDiv = document.getElementById('modal-sources-list');
+
+            // Tüm kaynakları göster
+            let html = '';
+            allSourcesData.forEach((source, index) => {
+                const percentage = allSourcesData.length > 0 ? (source.count / allSourcesData[0].count) * 100 : 0;
+                html += `
+                    <div class="source-bar">
+                        <div class="source-bar-label">
+                            <strong>${index + 1}. ${source.source}</strong>
+                            <span>${source.count} haber</span>
+                        </div>
+                        <div class="source-bar-graph">
+                            <div class="source-bar-fill" style="width: ${percentage}%">
+                                ${percentage >= 15 ? source.count + ' haber' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listDiv.innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        function showAllSourcesStatus() {
+            const modal = document.getElementById('statusModal');
+            const gridDiv = document.getElementById('modal-status-grid');
+
+            // Önce başarısızlar, sonra çalışanlar
+            let html = '';
+            fullStatusData.failed_list.forEach(source => {
+                html += `
+                    <div class="source-badge failed" title="${source.last_error}">
+                        <div class="status-dot"></div>
+                        <span>${source.name}</span>
+                    </div>
+                `;
+            });
+
+            fullStatusData.working_list.forEach(source => {
+                html += `
+                    <div class="source-badge working">
+                        <div class="status-dot"></div>
+                        <span>${source.name}</span>
+                    </div>
+                `;
+            });
+
+            gridDiv.innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+
+
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/dashboard-stats?limit_sources=10000');
+                const data = await response.json();
+
+                document.getElementById('loading').style.display = 'none';
+                renderStats(data);
+                renderSources(data.sources);
+                renderTopSources(data.today.by_source);
+                renderAllTimeTopSources(data.all_time.by_source);
+            } catch (err) {
+                document.getElementById('loading').innerHTML =
+                    '<div class="error">Hata: Veriler yüklenemedi. ' + err + '</div>';
+            }
+        }
+
+        async function loadTrending() {
+            try {
+                console.log('Trending topics yükleniyor...');
+                const response = await fetch('/api/trending-topics');
+                const data = await response.json();
+
+                console.log('Trending API response:', data);
+
+                if (data.clusters && data.clusters.length > 0) {
+                    console.log('Clusters bulundu:', data.clusters.length);
+                    renderTrending(data.clusters);
+                } else {
+                    console.log('Cluster bulunamadı');
+                    document.getElementById('trending-grid').innerHTML =
+                        '<p style="text-align: center; color: #64748b; padding: 40px;">Henüz yeterli haber yok veya clustering işlemi tamamlanmadı.</p>';
+                }
+            } catch (err) {
+                console.error('Trending topics yüklenemedi:', err);
+                document.getElementById('trending-grid').innerHTML =
+                    '<p style="text-align: center; color: #ef4444; padding: 40px;">Hata: ' + err.message + '</p>';
+            }
+        }
+
+        function renderTrending(clusters) {
+            try {
+                console.log('renderTrending çağrıldı, cluster sayısı:', clusters.length);
+                const section = document.getElementById('trending-section');
+                const grid = document.getElementById('trending-grid');
+
+                // Veriyi global kaydet
+                allClustersData = clusters;
+
+                let html = '';
+
+                clusters.forEach((cluster, index) => {
+                    console.log('Cluster #' + index, cluster);
+
+                    // Safely get articles array
+                    const articles = Array.isArray(cluster.articles) ? cluster.articles : [];
+                    const articlesCount = articles.length;
+                    const sourcesCount = articles.length > 0 ? new Set(articles.map(a => a.source || 'Unknown')).size : 0;
+                    const keywords = Array.isArray(cluster.keywords) ? cluster.keywords.join(', ') : (cluster.keywords || '');
+
+                    html += `
+                        <div class="trending-card" onclick="showTrendingDetails(${index})">
+                            <div class="trending-card-header">
+                                <h3 class="trending-title">${cluster.main_topic || cluster.title || 'Başlıksız'}</h3>
+                                <span class="trending-stats">${articlesCount} haber, ${sourcesCount} kaynak</span>
+                            </div>
+                            <p class="trending-keywords">Anahtar Kelimeler: ${keywords}</p>
+                            <div class="trending-articles">
+                                ${articles.slice(0, 3).map(article => `
+                                    <div class="trending-article-item">
+                                        <span class="article-source">${article.source || 'Bilinmeyen'}</span>
+                                        <span class="article-title">${article.title || 'Başlık yok'}</span>
+                                    </div>
+                                `).join('')}
+                                ${articlesCount > 3 ? `<span class="more-articles-hint">Tıklayarak ${articlesCount - 3} haberi daha görün</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                grid.innerHTML = html;
+                section.style.display = 'block';
+                console.log('Trending topics başarıyla render edildi');
+            } catch (err) {
+                console.error('renderTrending hatası:', err);
+                document.getElementById('trending-grid').innerHTML =
+                    '<p style="text-align: center; color: #ef4444; padding: 40px;">Render hatası: ' + err.message + '</p>';
+            }
+        }
+
+        function showAllSourcesAllTime() {
+            const modal = document.getElementById('sourcesAllTimeModal');
+            const listDiv = document.getElementById('modal-sources-all-time-list');
+
+            if (!allSourcesAllTimeData) return;
+
+            // Tüm kaynakları göster
+            let html = '';
+            allSourcesAllTimeData.forEach((source, index) => {
+                const percentage = allSourcesAllTimeData.length > 0 ? (source.count / allSourcesAllTimeData[0].count) * 100 : 0;
+                html += `
+                    <div class="source-bar">
+                        <div class="source-bar-label">
+                            <strong>${index + 1}. ${source.source}</strong>
+                            <span>${source.count.toLocaleString()} haber</span>
+                        </div>
+                        <div class="source-bar-graph">
+                            <div class="source-bar-fill" style="width: ${percentage}%">
+                                ${percentage >= 15 ? source.count.toLocaleString() + ' haber' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listDiv.innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        function showTrendingDetails(clusterIndex) {
+            try {
+                const cluster = allClustersData[clusterIndex];
+                if (!cluster) {
+                    console.error('Cluster bulunamadı:', clusterIndex);
+                    return;
+                }
+
+                const modal = document.getElementById('trendingModal');
+                const titleEl = document.getElementById('trending-modal-title');
+                const contentEl = document.getElementById('trending-modal-content');
+
+                const articles = cluster.articles || [];
+                const articlesCount = articles.length;
+                const sourcesCount = articles.length > 0 ? new Set(articles.map(a => a.source)).size : 0;
+                const keywords = Array.isArray(cluster.keywords) ? cluster.keywords.join(', ') : (cluster.keywords || '');
+
+                titleEl.textContent = '🔥 ' + (cluster.main_topic || cluster.title || 'Trending Topic');
+
+                let html = `
+                <div style="margin-bottom: 20px; padding: 20px; background: #1e293b; border-radius: 12px; border: 1px solid #334155;">
+                    <div style="display: flex; gap: 30px; margin-bottom: 15px;">
+                        <div>
+                            <span style="color: #94a3b8; font-size: 13px;">HABER SAYISI</span>
+                            <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">${articlesCount}</div>
+                        </div>
+                        <div>
+                            <span style="color: #94a3b8; font-size: 13px;">KAYNAK SAYISI</span>
+                            <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">${sourcesCount}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <span style="color: #94a3b8; font-size: 13px;">ANAHTAR KELİMELER</span>
+                        <div style="color: #555; margin-top: 5px; font-weight: 500;">${keywords}</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 15px; color: #333; font-size: 18px;">📰 Tüm Haberler</h3>
+                <div style="max-height: 500px; overflow-y: auto;">
+            `;
+
+                if (articles.length > 0) {
+                    articles.forEach((article, idx) => {
+                        html += `
+                    <div style="padding: 15px; margin-bottom: 10px; background: rgba(30, 41, 59, 0.5); border-radius: 10px; border: 1px solid #334155; transition: 0.2s;" 
+                         onmouseover="this.style.borderColor='rgba(59, 130, 246, 0.5)'" 
+                         onmouseout="this.style.borderColor='#334155'">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <span style="background: rgba(124, 58, 237, 0.15); color: #a78bfa; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; border: 1px solid rgba(124, 58, 237, 0.2);">${article.source || 'Bilinmeyen'}</span>
+                            <span style="color: #94a3b8; font-size: 12px;">#${idx + 1}</span>
+                        </div>
+                        <a href="${article.link || article.url || '#'}" target="_blank" style="color: #e2e8f0; text-decoration: none; font-weight: 500; display: block; margin-bottom: 8px; line-height: 1.5;" 
+                           onmouseover="this.style.color='#60a5fa'" 
+                           onmouseout="this.style.color='#e2e8f0'">
+                            ${article.title || 'Başlık yok'}
+                        </a>
+                        <div style="font-size: 12px; color: #94a3b8;">${article.published_date || article.pub_date || ''}</div>
+                    </div>
+                `;
+                    });
+                }
+
+                html += '</div>';
+                contentEl.innerHTML = html;
+                modal.style.display = 'block';
+            } catch (err) {
+                console.error('Modal açma hatası:', err);
+                alert('Trending topic detayları gösterilirken bir hata oluştu: ' + err.message);
+            }
+        }
+
+        function renderStats(data) {
+            const statsHtml = `
+                <div class="stat-card">
+                    <div class="stat-number">${data.sources.total}</div>
+                    <div class="stat-label">📡 Toplam Kaynak</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-number">${data.sources.working}</div>
+                    <div class="stat-label">✅ Çalışan Kaynak</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-number">${data.sources.failed}</div>
+                    <div class="stat-label">❌ Başarısız Kaynak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.today.count.toLocaleString()}</div>
+                    <div class="stat-label">📅 Son 6 Saat</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.all_time.count.toLocaleString()}</div>
+                    <div class="stat-label">📰 Toplam Haber</div>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = statsHtml;
+            document.getElementById('stats').style.display = 'grid';
+        }
+
+        function renderSources(sources) {
+            const section = document.getElementById('sources-section');
+            const grid = document.getElementById('sources-grid');
+
+            // Tüm veriyi global'e kaydet
+            fullStatusData = sources;
+
+            // Sadece ilk 20'sini sayfa içinde göster
+            let html = '';
+            sources.failed_list.slice(0, 20).forEach(source => {
+                html += `
+                    <div class="source-badge failed" title="${source.last_error}">
+                        <div class="status-dot"></div>
+                        <span>${source.name}</span>
+                    </div>
+                `;
+            });
+
+            sources.working_list.slice(0, 20).forEach(source => {
+                html += `
+                    <div class="source-badge working">
+                        <div class="status-dot"></div>
+                        <span>${source.name}</span>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+            section.style.display = 'block';
+        }
+
+        function renderTopSources(topSources) {
+            if (topSources.length === 0) return;
+
+            // Tüm veriyi global'e kaydet (API'den zaten gelen veri)
+            allSourcesData = topSources;
+
+            const maxCount = topSources[0].count;
+            let html = '';
+
+            // İlk 10'unu göster
+            topSources.slice(0, 10).forEach(source => {
+                const percentage = (source.count / maxCount) * 100;
+                html += `
+                    <div class="source-bar">
+                        <div class="source-bar-label">
+                            <strong>${source.source}</strong>
+                            <span>${source.count} haber</span>
+                        </div>
+                        <div class="source-bar-graph">
+                            <div class="source-bar-fill" style="width: ${percentage}%">
+                                ${percentage >= 15 ? source.count + ' haber' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('top-sources-list').innerHTML = html;
+            document.getElementById('top-sources').style.display = 'block';
+        }
+
+        function renderAllTimeTopSources(allTimeSources) {
+            if (allTimeSources.length === 0) return;
+
+            // Tüm veriyi global'e kaydet
+            allSourcesAllTimeData = allTimeSources;
+
+            const maxCount = allTimeSources[0].count;
+            let html = '';
+
+            // İlk 10'unu göster
+            allTimeSources.slice(0, 10).forEach(source => {
+                const percentage = (source.count / maxCount) * 100;
+                html += `
+                    <div class="source-bar">
+                        <div class="source-bar-label">
+                            <strong>${source.source}</strong>
+                            <span>${source.count.toLocaleString()} haber</span>
+                        </div>
+                        <div class="source-bar-graph">
+                            <div class="source-bar-fill" style="width: ${percentage}%">
+                                ${percentage >= 15 ? source.count.toLocaleString() + ' haber' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('top-sources-all-time-list').innerHTML = html;
+            document.getElementById('top-sources-all-time').style.display = 'block';
+        }
+
+
+
+
+        // =============== NEW ADVANCED WIDGETS FUNCTIONS ===============
+
+        let timeSeriesChart = null;
+        let sentimentChart = null;
+
+        // 1. Load News Flow Rate
+        async function loadFlowRate() {
+            try {
+                const response = await fetch('/api/news-flow-rate?minutes=60');
+                const data = await response.json();
+
+                document.getElementById('news-per-minute').textContent = data.news_per_minute.toFixed(1);
+                document.getElementById('news-per-hour').textContent = data.news_per_hour;
+            } catch (err) {
+                console.error('Flow rate error:', err);
+            }
+        }
+
+        //2. Load Comparison (Today vs Yesterday)
+        async function loadComparison() {
+            try {
+                const response = await fetch('/api/comparison');
+                const data = await response.json();
+
+                document.getElementById('today-count').textContent = data.today;
+                document.getElementById('yesterday-count').textContent = data.yesterday;
+
+                const changeEl = document.getElementById('change-percent');
+                const changePercent = data.change_percent >= 0 ? `+${data.change_percent}%` : `${data.change_percent}%`;
+                changeEl.textContent = changePercent;
+                changeEl.style.color = data.change > 0 ? '#22c55e' : data.change < 0 ? '#ef4444' : '#94a3b8';
+            } catch (err) {
+                console.error('Comparison error:', err);
+            }
+        }
+
+        // 3. Load Time Series Chart
+        async function loadTimeSeriesChart() {
+            try {
+                const response = await fetch('/api/time-series?hours=24');
+                const data = await response.json();
+
+                const ctx = document.getElementById('timeSeriesChart').getContext('2d');
+
+                // Destroy existing chart
+                if (timeSeriesChart) {
+                    timeSeriesChart.destroy();
+                }
+
+                const labels = data.data.map(d => {
+                    // API sends 'YYYY-MM-DD HH:00' in UTC, must add 'Z' to parse as UTC
+                    const utcDate = new Date(d.hour + ':00Z');
+                    // Convert to Turkey time (UTC+3)
+                    return utcDate.toLocaleTimeString('tr-TR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'Europe/Istanbul'
+                    }).slice(0, 5); // Get HH:MM format
+                });
+                const counts = data.data.map(d => d.count);
+
+                timeSeriesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Haber Sayısı',
+                            data: counts,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    maxRotation: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error('Time series error:', err);
+            }
+        }
+
+        // Helper: Convert UTC string to TR Time (HH:MM)
+        function formatDateTR(dateStr) {
+            if (!dateStr) return '';
+            try {
+                // API sends 'YYYY-MM-DD HH:MM:SS' (UTC). Force UTC interpretation.
+                const isoStr = dateStr.replace(' ', 'T') + 'Z';
+                const date = new Date(isoStr);
+                // Use Turkey timezone (UTC+3)
+                return date.toLocaleTimeString('tr-TR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'Europe/Istanbul'
+                });
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // 4. Load Live Feed
+        async function loadLiveFeed() {
+            try {
+                const response = await fetch('/api/live-feed?limit=20');
+                const data = await response.json();
+
+                const feed = document.getElementById('live-feed');
+                let html = '';
+
+                data.news.forEach(item => {
+                    html += `
+                        <div style="padding: 12px; margin-bottom: 10px; background: #1e293b; border-radius: 12px; border-left: 3px solid #3b82f6; transition: 0.2s; border: 1px solid #334155; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
+                                <span style="background: rgba(124, 58, 237, 0.15); color: #a78bfa; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; border: 1px solid rgba(124, 58, 237, 0.2); display: inline-block;">${item.source}</span>
+                                <span style="color: #94a3b8; font-size: 10px;">
+                                    ${formatDateTR(item.pub_date || item.created_at)} • ${item.time_ago}
+                                </span>
+                            </div>
+                            <a href="${item.link}" target="_blank" style="color: #e2e8f0; text-decoration: none; font-size: 13px; line-height: 1.5; display: block; font-weight: 500;" onmouseover="this.style.color='#60a5fa'" onmouseout="this.style.color='#e2e8f0'">
+                                ${item.title}
+                            </a>
+                        </div>
+                    `;
+                });
+
+                feed.innerHTML = html || '<p style="text-align: center; color: #94a3b8; padding: 20px;">Henüz haber yok</p>';
+            } catch (err) {
+                console.error('Live feed error:', err);
+            }
+        }
+
+        // 5. Load Word Cloud
+        async function loadWordCloud() {
+            try {
+                const response = await fetch('/api/word-cloud?limit=40&hours=6');
+                const data = await response.json();
+
+                const wordCloud = document.getElementById('word-cloud');
+                let html = '';
+
+                const maxCount = data.words[0]?.count || 1;
+
+                data.words.forEach((word, idx) => {
+                    const fontSize = 12 + (word.count / maxCount) * 24; // 12px to 36px
+                    const opacity = 0.6 + (word.count / maxCount) * 0.4;
+                    const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#22c55e', '#f59e0b'];
+                    const color = colors[idx % colors.length];
+
+                    html += `
+                        <span style="font-size: ${fontSize}px; color: ${color}; opacity: ${opacity}; font-weight: 700; cursor: pointer; transition: 0.2s; padding: 5px 10px;" 
+                              onmouseover="this.style.transform='scale(1.2)'; this.style.opacity='1'" 
+                              onmouseout="this.style.transform='scale(1)'; this.style.opacity='${opacity}'"
+                              title="${word.count} kez geçiyor">
+                            ${word.word}
+                        </span>
+                    `;
+                });
+
+                wordCloud.innerHTML = html || '<p style="color: #64748b;">Veri yok</p>';
+            } catch (err) {
+                console.error('Word cloud error:', err);
+            }
+        }
+
+        // 6. Load Source Performance
+        // 6. Load Source Performance
+        async function loadSourcePerformance() {
+            try {
+                const response = await fetch('/api/source-performance');
+                const data = await response.json();
+
+                const container = document.getElementById('source-performance');
+                let html = `
+                    <div style="overflow-x: auto; background: #1e293b; border-radius: 12px; padding: 10px; border: 1px solid #334155;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #0f172a; color: #94a3b8;">
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 700; border-radius: 8px 0 0 8px;">SIRA</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 700;">KAYNAK</th>
+                                    <th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 700;">HABER/SAAT</th>
+                                    <th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 700; border-radius: 0 8px 8px 0;">TOPLAM</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                if (data.sources && Array.isArray(data.sources)) {
+                    data.sources.slice(0, 15).forEach((source, idx) => {
+                        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '';
+                        html += `
+                            <tr style="border-bottom: 1px solid #334155; transition: 0.2s;" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='transparent'">
+                                <td style="padding: 12px; font-weight: 600; color: #94a3b8; font-size: 13px;">${medal}${idx + 1}</td>
+                                <td style="padding: 12px; font-weight: 600; color: #e2e8f0; font-size: 13px;">${source.source}</td>
+                                <td style="padding: 12px; text-align: right; font-weight: 700; color: #60a5fa; font-size: 13px;">${source.avg_per_hour}</td>
+                                <td style="padding: 12px; text-align: right; color: #94a3b8; font-size: 13px;">${source.total}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Source performance error:', err);
+                document.getElementById('source-performance').innerHTML =
+                    '<p style="text-align:center; color:#ef4444;">Veri yüklenirken hata oluştu.</p>';
+            }
+        }
+
+        // 7. Load Sentiment Analysis
+        async function loadSentiment() {
+            try {
+                const response = await fetch('/api/sentiment');
+                const data = await response.json();
+
+                document.getElementById('positive-count').textContent = data.positive;
+                document.getElementById('neutral-count').textContent = data.neutral;
+                document.getElementById('negative-count').textContent = data.negative;
+
+                // Update percentages
+                const total = data.positive + data.neutral + data.negative;
+                const posPercent = total > 0 ? Math.round((data.positive / total) * 100) : 0;
+                const neuPercent = total > 0 ? Math.round((data.neutral / total) * 100) : 0;
+                const negPercent = total > 0 ? Math.round((data.negative / total) * 100) : 0;
+
+                // Elementler varsa güncelle (yeni tasarım)
+                if (document.getElementById('positive-percent'))
+                    document.getElementById('positive-percent').textContent = posPercent + '%';
+                if (document.getElementById('neutral-percent'))
+                    document.getElementById('neutral-percent').textContent = neuPercent + '%';
+                if (document.getElementById('negative-percent'))
+                    document.getElementById('negative-percent').textContent = negPercent + '%';
+
+                const ctx = document.getElementById('sentimentChart').getContext('2d');
+
+                if (sentimentChart) {
+                    sentimentChart.destroy();
+                }
+
+                sentimentChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pozitif', 'Nötr', 'Negatif'],
+                        datasets: [{
+                            data: [data.positive, data.neutral, data.negative],
+                            backgroundColor: [
+                                '#10b981', // Pozitif (Green)
+                                '#94a3b8', // Nötr (Slate - Corrected)
+                                '#ef4444'  // Negatif (Red)
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    font: {
+                                        size: 12,
+                                        family: "'Inter', sans-serif"
+                                    },
+                                    color: '#94a3b8'
+                                }
+                            }
+                        },
+                        cutout: '75%'
+                    }
+                });
+            } catch (err) {
+                console.error('Sentiment error:', err);
+            }
+        }
+
+        // Load all new widgets
+        function loadAllAdvancedWidgets() {
+            loadFlowRate();
+            loadComparison();
+            loadTimeSeriesChart();
+            loadLiveFeed();
+            loadWordCloud();
+            loadSourcePerformance();
+            loadSentiment();
+        }
+
+        // Call on page load
+        loadAllAdvancedWidgets();
+
+        // Auto refresh every 60 seconds
+        setInterval(() => {
+            loadDashboard();
+            loadTrending();
+            loadAllAdvancedWidgets(); // Refresh new widgets too
+        }, 60000);
+
+        // Live feed auto-refresh more frequently (every 30 seconds)
+        setInterval(() => {
+            loadLiveFeed();
+        }, 30000);
+    </script>
+</body>
+
+</html>

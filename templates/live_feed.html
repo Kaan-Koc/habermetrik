@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canlı Akış - HaberMetrik</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Playfair+Display:wght@400;700;900&family=Segoe+UI:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            background-image: url('/static/img/newspaper_bg.jpg');
+            background-size: 400px;
+            background-repeat: repeat;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(241, 245, 249, 0.85);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            width: 100%;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .newspaper-container {
+            width: 100%;
+            padding: 0;
+            margin: 40px 0;
+        }
+
+        .newspaper-header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 3px double #cbd5e1;
+            padding-bottom: 30px;
+        }
+
+        .newspaper-date {
+            font-family: 'Merriweather', serif;
+            color: #64748b;
+            font-style: italic;
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .newspaper-date::before,
+        .newspaper-date::after {
+            content: "";
+            height: 1px;
+            width: 50px;
+            background: #cbd5e1;
+            display: block;
+        }
+
+        .newspaper-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 64px;
+            color: #1e293b;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            background: linear-gradient(to right, #dc2626, #ef4444);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .newspaper-subtitle {
+            font-family: 'Merriweather', serif;
+            color: #64748b;
+            margin-top: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .live-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .masonry-grid {
+                column-count: 1;
+            }
+
+            .newspaper-title {
+                font-size: 42px;
+            }
+        }
+
+        .news-card {
+            break-inside: avoid;
+            background: white;
+            border-radius: 2px;
+            margin-bottom: 30px;
+            padding: 25px;
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
+            border-bottom: 4px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-bottom-color: #ef4444;
+        }
+
+        .news-source {
+            font-family: 'Segoe UI', sans-serif;
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .news-time {
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        .news-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            line-height: 1.3;
+            color: #0f172a;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .news-desc {
+            font-family: 'Merriweather', serif;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .read-more {
+            display: inline-block;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ef4444;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .read-more:hover {
+            border-bottom-color: #ef4444;
+        }
+
+        /* Wide card for variety */
+        .news-card.wide {
+            grid-column: span 2;
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .news-card.wide .news-image-container {
+            width: 50%;
+            height: 100%;
+            min-height: 350px;
+            overflow: hidden;
+            position: relative;
+            margin: -25px 0 -25px -25px;
+            border-radius: 2px 0 0 2px;
+        }
+
+        .news-card.wide .news-content-container {
+            width: 50%;
+        }
+
+        @media (max-width: 1100px) {
+            .news-card.wide {
+                grid-column: span 1;
+                display: block;
+            }
+
+            .news-card.wide .news-image-container {
+                width: 100%;
+                height: 250px;
+                margin: -25px -25px 20px -25px;
+            }
+
+            .news-card.wide .news-content-container {
+                width: 100%;
+            }
+        }
+
+        /* Featured card style */
+        .news-card.featured {
+            background: #1e293b;
+            color: white;
+            border-bottom: none;
+            padding: 40px;
+        }
+
+        .news-card.featured .news-title {
+            color: white;
+            font-size: 32px;
+        }
+
+        .news-card.featured .news-desc {
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+
+        .news-card.featured .news-source {
+            color: #94a3b8;
+        }
+
+        .news-card.featured .read-more {
+            color: #60a5fa;
+        }
+
+        .news-card.featured .read-more:hover {
+            border-bottom-color: #60a5fa;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 50px 0;
+            color: #64748b;
+            font-size: 14px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 50px;
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 101;
+        }
+
+        @media (max-width: 900px) {
+            .header-content {
+                padding: 0 20px;
+                position: relative;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .logo-text h1 {
+                font-size: 20px;
+            }
+
+            .logo-text p {
+                font-size: 11px;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                width: 250px;
+                background: #1e3a8a;
+                flex-direction: column;
+                padding: 10px;
+                gap: 5px;
+                box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.3);
+                border-radius: 0 0 0 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-top: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                color: #e2e8f0;
+                width: 100%;
+                text-align: left;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+            .nav-links a:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links span {
+                display: none;
+                /* Hide username on mobile to save space */
+            }
+        }
+
+        @media (max-width: 700px) {
+            .news-card.featured {
+                padding: 20px;
+            }
+
+            .news-card.featured .news-title {
+                font-size: 22px;
+                /* Reduced from 32px */
+            }
+
+            .news-card.featured .news-desc {
+                font-size: 14px;
+                /* Reduced from 16px */
+            }
+
+            .news-card.wide .news-image-container {
+                height: auto !important;
+                aspect-ratio: 16/9;
+                min-height: auto !important;
+            }
+
+            .news-title {
+                font-size: 18px;
+                /* Reduced for normal cards */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <div class="header">
+        <div class="header-content">
+            <a href="/search-grouped" class="logo">
+                <div class="logo-icon">📰</div>
+                <div class="logo-text">
+                    <h1>HaberMetrik</h1>
+                    <p>AI-Powered News Aggregation</p>
+                </div>
+            </a>
+            <div class="mobile-menu-btn" onclick="toggleMenu()">&#8942;</div>
+            <div class="nav-links">
+                <span style="color: #cbd5e1;">{{ user.username }}</span>
+                <a href="/sanal-gazete">📰 Sanal Gazetem</a>
+                <a href="/canli-akis" style="color: #fff; background: rgba(239, 68, 68, 0.2);">🔴 Canlı Akış</a>
+                <a href="/search-grouped">🔍 AI Arama</a>
+                <a href="/depremler">🌍 Son Depremler</a>
+                {% if user.role == 'admin' %}
+                <a href="/dashboard">📊 Dashboard</a>
+                <a href="/admin" style="color: #ef4444;">🛡️ Admin</a>
+                {% endif %}
+                <a href="/logout" style="color: #ef4444;">Çıkış</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newspaper Content -->
+    <div class="newspaper-container">
+        <div class="newspaper-header">
+            <div class="newspaper-date">
+                <script>document.write(new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))</script>
+            </div>
+            <h1 class="newspaper-title">🔴 Canlı Haber Akışı</h1>
+            <div class="newspaper-subtitle">
+                <span>Anlık haberler ve son gelişmeler</span>
+                <span class="live-badge">LIVE</span>
+            </div>
+        </div>
+
+        <div id="news-grid" class="masonry-grid">
+            <div style="text-align: center; padding: 100px; font-size: 18px; color: #64748b;">Yükleniyor...</div>
+        </div>
+
+        <div class="footer">
+            &copy; 2025 HaberMetrik Canlı Akış. Tüm hakları saklıdır.
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            const navLinks = document.querySelector('.nav-links');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+
+            if (!navLinks.contains(e.target) && !menuBtn.contains(e.target) && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        function formatTimeAgo(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString + 'Z');
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+
+            if (diffSec < 60) return 'Az önce';
+            if (diffMin < 60) return diffMin + ' dk önce';
+            if (diffHour < 24) return diffHour + ' sa önce';
+            return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        async function loadLiveFeed() {
+            try {
+                const response = await fetch('/api/live-feed?limit=50');
+                const data = await response.json();
+
+                const grid = document.getElementById('news-grid');
+                let html = '';
+
+                // Sort strictly by time for Live Feed (newest first)
+                // The API already returns them sorted by date desc, but we ensure it here just in case/if merged
+                // No re-sorting by image here because "Live" means "Time" is priority.
+
+                data.news.forEach((item, index) => {
+                    const isFeaturedSlot = (index === 0 || (index + 1) % 7 === 0);
+                    const hasImage = !!item.image_url;
+
+                    if (hasImage) {
+                        if (isFeaturedSlot) {
+                            // CASE 1: Featured Wide Image Card
+                            html += `
+                            <div class="news-card featured wide">
+                                <div class="news-image-container">
+                                    <img src="${item.image_url}" alt=""
+                                        onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.width='100%';"
+                                        style="width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0;">
+                                </div>
+                                <div class="news-content-container">
+                                    <div class="news-source">
+                                        <span>${item.source}</span>
+                                        <span class="news-time">${item.time_ago}</span>
+                                    </div>
+                                    <h2 class="news-title" style="font-size: 28px;">${item.title}</h2>
+                                    <div class="news-desc">${item.description || ''}</div>
+                                    <a href="${item.link}" target="_blank" class="read-more">Haberin Devamı →</a>
+                                </div>
+                            </div>
+                            `;
+                        } else {
+                            // CASE 2: Normal Image Card
+                            html += `
+                            <div class="news-card">
+                                <div style="height: 200px; overflow: hidden; margin: -25px -25px 20px -25px; border-radius: 2px 2px 0 0;">
+                                    <img src="${item.image_url}" alt=""
+                                        onerror="this.parentElement.style.display='none'; this.parentElement.parentElement.classList.add('text-only-fallback');"
+                                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
+                                </div>
+                                <div class="news-source">
+                                    <span>${item.source}</span>
+                                    <span class="news-time">${item.time_ago}</span>
+                                </div>
+                                <h2 class="news-title">${item.title}</h2>
+                                <div class="news-desc">${item.description || ''}</div>
+                                <a href="${item.link}" target="_blank" class="read-more">Devamını Oku →</a>
+                            </div>
+                            `;
+                        }
+                    } else {
+                        // Text Only
+                        if (isFeaturedSlot) {
+                            // CASE 3: Featured Text Only Card
+                            html += `
+                            <div class="news-card featured">
+                                <div style="width: 100%;">
+                                    <div class="news-source">
+                                        <span>${item.source}</span>
+                                        <span class="news-time">${item.time_ago}</span>
+                                    </div>
+                                    <h2 class="news-title" style="font-size: 32px;">${item.title}</h2>
+                                    <div class="news-desc" style="font-size: 16px;">${item.description || ''}</div>
+                                    <a href="${item.link}" target="_blank" class="read-more">Haberin Devamı →</a>
+                                </div>
+                            </div>
+                            `;
+                        } else {
+                            // CASE 4: Normal Text Only Card
+                            html += `
+                            <div class="news-card">
+                                <div style="width: 100%;">
+                                    <div class="news-source">
+                                        <span>${item.source}</span>
+                                        <span class="news-time">${item.time_ago}</span>
+                                    </div>
+                                    <h2 class="news-title" style="font-size: 22px;">${item.title}</h2>
+                                    <div class="news-desc" style="font-style: italic; border-left: 3px solid #cbd5e1; padding-left: 15px;">
+                                        ${item.description || ''}
+                                    </div>
+                                    <a href="${item.link}" target="_blank" class="read-more">Devamını Oku →</a>
+                                </div>
+                            </div>
+                            `;
+                        }
+                    }
+                });
+
+                grid.innerHTML = html || '<div style="text-align: center; padding: 100px; font-size: 18px; color: #64748b;">Henüz haber yok</div>';
+            } catch (error) {
+                console.error('Live feed error:', error);
+                document.getElementById('news-grid').innerHTML = '<div style="text-align: center; padding: 100px; font-size: 18px; color: #64748b;">Hata oluştu</div>';
+            }
+        }
+
+        // Load initially
+        loadLiveFeed();
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadLiveFeed, 30000);
+    </script>
+</body>
+
+</html>

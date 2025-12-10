@@ -1,0 +1,128 @@
+/Users/kaankoc/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Veritabanı başlatılıyor...
+Veritabanı başlatıldı
+Arka plan güncellemeleri başlatılıyor...
+  - hurriyet thread başlatıldı
+  - milliyet thread başlatıldı
+  - ntv thread başlatıldı
+  - fanatik thread başlatıldı
+  - vatan thread başlatıldı
+  - mynet thread başlatıldı
+  - haberturk thread başlatıldı
+  - cnnturk thread başlatıldı
+  - sozcu thread başlatıldı
+  - takvim thread başlatıldı
+  - aksam thread başlatıldı
+  - t24 thread başlatıldı
+  - bianet thread başlatıldı
+  - bloomberght thread başlatıldı
+  - cumhuriyet thread başlatıldı
+  - diken thread başlatıldı
+  - dirilispostasi thread başlatıldı
+  - dunya thread başlatıldı
+  - ensonhaber thread başlatıldı
+  - evrensel thread başlatıldı
+  - f5haber thread başlatıldı
+  - fotomac thread başlatıldı
+  - haber7 thread başlatıldı
+  - haberler thread başlatıldı
+  - habervaktim thread başlatıldı
+  - habervitrini thread başlatıldı
+  - haberx thread başlatıldı
+  - hurhaber thread başlatıldı
+  - internethaber thread başlatıldı
+  - karar thread başlatıldı
+  - medyascope thread başlatıldı
+  - memurlar thread başlatıldı
+  - milatgazetesi thread başlatıldı
+  - milligazete thread başlatıldı
+  - neoldu thread başlatıldı
+  - ntvspor thread başlatıldı
+  - odatv thread başlatıldı
+  - onedio thread başlatıldı
+  - posta thread başlatıldı
+  - sabah thread başlatıldı
+  - sondakika thread başlatıldı
+  - star thread başlatıldı
+  - superhaber thread başlatıldı
+  - tgrthaber thread başlatıldı
+  - timeturk thread başlatıldı
+  - trthaber thread başlatıldı
+  - turkiyegazetesi thread başlatıldı
+  - turktime thread başlatıldı
+  - tv100 thread başlatıldı
+  - veryansintv thread başlatıldı
+  - yeniakit thread başlatıldı
+  - yenisafak thread başlatıldı
+  - gazeteduvar thread başlatıldı
+  - haberglobal thread başlatıldı
+  - halktv thread başlatıldı
+  - antalyahaber thread başlatıldı
+  - kayserihaber thread başlatıldı
+  - mersinhaber thread başlatıldı
+  - gaziantephaberler thread başlatıldı
+  - vansesigazetesi thread başlatıldı
+  - nefes thread başlatıldı
+  - birgun thread başlatıldı
+  - kamudanhaber thread başlatıldı
+  - airporthaber thread başlatıldı
+  - gzt thread başlatıldı
+  - mansethaber thread başlatıldı
+  - gazeteoksijen thread başlatıldı
+  - saraymedya thread başlatıldı
+  - habertS thread başlatıldı
+  - internethaber_alt thread başlatıldı
+  - gazeteduvar_alt thread başlatıldı
+  - yenisafak_alt thread başlatıldı
+  - hurhaber_alt thread başlatıldı
+Toplam 73 güncelleme thread'i başlatıldı
+
+Flask uygulaması başlatılıyor...
+API: http://localhost:5001
+Arama: http://localhost:5001/api/search?q=keyword
+
+Çıkmak için Ctrl+C
+
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.10:5001
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [10/Dec/2025 00:46:27] "GET /search-grouped?q=galatasaray HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:28] "GET /search-grouped?q=galatasaray HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:30] "GET /search-grouped?q=türkiye HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:31] "GET /search-grouped?q=türkiye HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:32] "GET /search-grouped?q=yeni HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:36] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:36] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:36] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:36] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/live-feed?limit=20 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/word-cloud?limit=40&hours=6 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/comparison HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/news-flow-rate?minutes=60 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/source-performance HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/time-series?hours=24 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/sentiment HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/dashboard-stats?limit_sources=10000 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:46:49] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:47:19] "GET /api/live-feed?limit=20 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:47:46] "GET /sanal-gazete HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:47:46] "[36mGET /static/img/newspaper_bg.jpg HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Dec/2025 00:48:03] "GET /sanal-gazete HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:48:03] "[36mGET /static/img/newspaper_bg.jpg HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Dec/2025 00:48:37] "GET /sanal-gazete HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:48:37] "[36mGET /static/img/newspaper_bg.jpg HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Dec/2025 00:48:40] "GET /search-grouped HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:48:40] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:48:42] "GET /search-grouped HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:48:42] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:48:52] "GET /api/search-grouped?q=türkiye HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:48:58] "GET /api/search-grouped?q=deprem HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:49:13] "GET /search-grouped HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:49:13] "GET /api/trending-topics HTTP/1.1" 200 -
+127.0.0.1 - - [10/Dec/2025 00:49:16] "GET /api/search-grouped?q=deprem HTTP/1.1" 200 -

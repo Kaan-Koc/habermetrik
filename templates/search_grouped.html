@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gruplandırılmış Arama - HaberMetrik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-box h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .info-text {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-text code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        #loading .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .results-summary {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .results-summary h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .results-summary p {
+            color: #666;
+        }
+
+        .cluster-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .cluster-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .cluster-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cluster-header:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+        }
+
+        .cluster-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .cluster-badge {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .cluster-toggle {
+            font-size: 24px;
+            transition: 0.3s;
+        }
+
+        .cluster-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .cluster-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .cluster-content.open {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .news-list {
+            padding: 20px 30px;
+        }
+
+        .news-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: 0.2s;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-item:hover {
+            background: #f8f9ff;
+        }
+
+        .news-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .news-title a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .news-title a:hover {
+            color: #667eea;
+        }
+
+        .news-meta {
+            color: #999;
+            font-size: 13px;
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .news-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-meta strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .no-results {
+            background: white;
+            padding: 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            display: none;
+        }
+
+        .no-results h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: #666;
+        }
+
+        /* Trending Topics Cards */
+        .trending-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .trending-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .trending-section p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .trending-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trending-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .trending-card:hover::before {
+            opacity: 1;
+        }
+
+        .trending-card:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .trending-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .trending-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .trending-stats {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .trending-keywords {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+            font-weight: 500;
+        }
+
+        .trending-article-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .trending-article-item:hover {
+            padding-left: 8px;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .trending-article-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-article-source {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            color: #667eea;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            white-space: nowrap;
+        }
+
+        .trending-article-title {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .more-articles-hint {
+            display: block;
+            color: #667eea;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            text-align: center;
+            padding: 8px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            border: 1px dashed rgba(102, 126, 234, 0.3);
+            transition: all 0.2s;
+        }
+
+        .more-articles-hint:hover {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            margin: 50px auto;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .modal-close {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .modal-news-item {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.2s;
+        }
+
+        .modal-news-item:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .modal-news-item a {
+            color: #333;
+            text-decoration: none;
+            display: block;
+        }
+
+        .modal-news-item a:hover {
+            color: #667eea;
+        }
+
+        .modal-news-source {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            color: #667eea;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 101;
+        }
+
+        @media (max-width: 900px) {
+            .header-content {
+                padding: 0 20px;
+                position: relative;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .logo-text h1 {
+                font-size: 20px;
+            }
+
+            .logo-text p {
+                font-size: 11px;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                width: 250px;
+                background: #1e3a8a;
+                flex-direction: column;
+                padding: 10px;
+                gap: 5px;
+                box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.3);
+                border-radius: 0 0 0 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-top: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                color: #e2e8f0;
+                width: 100%;
+                text-align: left;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+            .nav-links a:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links span {
+                display: none;
+                /* Hide username on mobile to save space */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="/search-grouped" class="logo">
+                <div class="logo-icon">📰</div>
+                <div class="logo-text">
+                    <h1>HaberMetrik</h1>
+                    <p>AI-Powered News Aggregation</p>
+                </div>
+            </a>
+            <div class="mobile-menu-btn" onclick="toggleMenu()">&#8942;</div>
+            <div class="nav-links">
+                <span style="color: #cbd5e1;">{{ user.username }}</span>
+                <a href="/sanal-gazete">📰 Sanal Gazetem</a>
+                <a href="/canli-akis">🔴 Canlı Akış</a>
+                <a href="/search-grouped" style="color: #fff; background: rgba(59, 130, 246, 0.2);">🔍 AI Arama</a>
+                <a href="/depremler">🌍 Son Depremler</a>
+                {% if user.role == 'admin' %}
+                <a href="/dashboard">📊 Dashboard</a>
+                <a href="/admin" style="color: #ef4444;">🛡️ Admin</a>
+                {% endif %}
+                <a href="/logout" style="color: #ef4444;">Çıkış</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- Arama Kutusu -->
+        <div class="search-box">
+            <h2>🔍 Haber Ara ve Grupla</h2>
+
+            <!-- Trending Topics Etiketleri -->
+            {% if trending_topics %}
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 15px; color: #64748b; margin-bottom: 12px; font-weight: 600;">📈 Gündemdeki
+                    Başlıklar</h3>
+                <div id="topicTagsContainer" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    {% for topic in trending_topics %}
+                    <a href="#" class="topic-tag" data-topic="{{ topic.word }}"
+                        style="text-decoration: none; background: #f1f5f9; padding: 6px 14px; border-radius: 20px; font-size: 13px; color: #334155; border: 1px solid #cbd5e1; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <span style="font-weight: 600;">#{{ topic.word }}</span>
+                        <span
+                            style="font-size: 11px; color: #94a3b8; background: #e2e8f0; padding: 1px 6px; border-radius: 10px;">{{
+                            topic.count }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="search-input-group">
+                <input type="text" id="searchInput" placeholder="Anahtar kelime ile ara (örn: deprem, ekonomi, spor)..."
+                    autofocus>
+                <button onclick="searchGrouped()">Ara ve Grupla</button>
+            </div>
+            <div class="info-text"
+                style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); padding: 20px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.2); margin-top: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <span style="font-size: 24px;">🤖</span>
+                    <strong style="font-size: 16px; color: #333;">Akıllı Haber Gruplama</strong>
+                </div>
+                <p style="color: #555; margin: 0; line-height: 1.6;">
+                    Yapay zeka (BERT) modelimiz, benzer içerikleri otomatik olarak tespit edip gruplar.
+                    Aynı olayı farklı açılardan anlatan haberler ayrı gruplarda gösterilir.
+                </p>
+            </div>
+        </div>
+
+        <!-- Modern Trending Topics Section -->
+        <div id="trendingSection" class="trending-section">
+            <h2>🔥 Gündemdeki Konular</h2>
+            <p>Son 6 saatin en popüler haberleri AI ile otomatik gruplandırılıyor</p>
+            <div id="trendingGrid" class="trending-grid">
+                <p style="text-align: center; color: #666; padding: 40px;">Gündemdeki konular yükleniyor...</p>
+            </div>
+        </div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Haberler aranıyor ve gruplandırılıyor...</p>
+        </div>
+
+        <div class="results-summary" id="resultsSummary">
+            <h3 id="summaryTitle"></h3>
+            <p id="summaryText"></p>
+        </div>
+
+        <div id="clusters"></div>
+
+        <div class="no-results" id="noResults">
+            <h3>Sonuç bulunamadı</h3>
+            <p>Farklı bir anahtar kelime deneyin.</p>
+        </div>
+    </div>
+
+    <!-- Modal for Trending Topic Details -->
+    <div id="trendingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="trending-modal-title" class="modal-title"></h2>
+                <span class="modal-close" onclick="closeTrendingModal()">×</span>
+            </div>
+            <div id="trending-modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            const navLinks = document.querySelector('.nav-links');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+
+            if (!navLinks.contains(e.target) && !menuBtn.contains(e.target) && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        let timeout = null;
+
+
+        // Türkçe tarih formatı
+        function formatTurkishDate(dateStr) {
+            if (!dateStr) return 'Tarih bilinmiyor';
+
+            try {
+                const date = new Date(dateStr);
+                const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+                const day = date.getDate();
+                const month = months[date.getMonth()];
+                const year = date.getFullYear();
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+
+                return `${day} ${month} ${year}, ${hours}:${minutes}`;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        // Kaynak ismini güzelleştir
+        function formatSourceName(source) {
+            const sourceNames = {
+                'aksam': 'Akşam',
+                'hurriyet': 'Hürriyet',
+                'milliyet': 'Milliyet',
+                'sozcu': 'Sözcü',
+                'cumhuriyet': 'Cumhuriyet',
+                'sabah': 'Sabah',
+                'haberturk': 'Habertürk',
+                'cnnturk': 'CNN Türk',
+                'ntv': 'NTV',
+                'trthaber': 'TRT Haber',
+                'yenisafak': 'Yeni Şafak',
+                't24': 'T24',
+                'diken': 'Diken',
+                'odatv': 'OdaTV',
+                'bianet': 'Bianet'
+            };
+
+            return sourceNames[source] || source.charAt(0).toUpperCase() + source.slice(1);
+        }
+
+        // Sayfa yüklenince trending topics yükle
+        window.addEventListener('load', () => {
+            loadTrendingTopics();
+        });
+
+        // Trending topics yükle
+        async function loadTrendingTopics() {
+            try {
+                const response = await fetch('/api/trending-topics');
+                const data = await response.json();
+
+                if (data.clusters && data.clusters.length > 0) {
+                    renderTrendingTopics(data.clusters);
+                } else {
+                    document.getElementById('trendingGrid').innerHTML =
+                        '<p style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">Gündem maddesi bulunamadı.</p>';
+                }
+            } catch (err) {
+                console.error('Trending topics yüklenemedi:', err);
+                document.getElementById('trendingGrid').innerHTML =
+                    '<p style="text-align: center; color: #ef4444; padding: 40px; grid-column: 1/-1;">Gündem yüklenirken hata oluştu.</p>';
+            }
+        }
+
+        // Trending topics render - dashboard-style cards
+        let allClustersData = [];
+
+        function renderTrendingTopics(clusters) {
+            const grid = document.getElementById('trendingGrid');
+            allClustersData = clusters;
+            let html = '';
+
+            clusters.forEach((cluster, index) => {
+                const articles = Array.isArray(cluster.articles) ? cluster.articles : [];
+                const articlesCount = articles.length;
+                const sourcesCount = articles.length > 0 ? new Set(articles.map(a => a.source || 'Unknown')).size : 0;
+                const keywords = Array.isArray(cluster.keywords) ? cluster.keywords.join(', ') : (cluster.keywords || '');
+
+                html += `
+                    <div class="trending-card" onclick="showTrendingDetails(${index})" style="cursor: pointer;">
+                        <div class="trending-card-header">
+                            <h3 class="trending-title">${cluster.main_topic || cluster.title || 'Başlıksız'}</h3>
+                            <span class="trending-stats">${articlesCount} haber, ${sourcesCount} kaynak</span>
+                        </div>
+                        <p class="trending-keywords">🔑 ${keywords}</p>
+                        <div class="trending-articles">
+                            ${articles.slice(0, 3).map(article => `
+                                <div class="trending-article-item">
+                                    <span class="trending-article-source">${formatSourceName(article.source || 'Bilinmeyen')}</span>
+                                    <span class="trending-article-title">${article.title || 'Başlık yok'}</span>
+                                </div>
+                            `).join('')}
+                            ${articlesCount > 3 ? `<span class="more-articles-hint">Tıklayarak ${articlesCount - 3} haberi daha görün</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // Modal functions
+        function showTrendingDetails(clusterIndex) {
+            try {
+                const cluster = allClustersData[clusterIndex];
+                if (!cluster) {
+                    console.error('Cluster bulunamadı:', clusterIndex);
+                    return;
+                }
+
+                const modal = document.getElementById('trendingModal');
+                const titleEl = document.getElementById('trending-modal-title');
+                const contentEl = document.getElementById('trending-modal-content');
+
+                const articles = cluster.articles || [];
+                const articlesCount = articles.length;
+                const sourcesCount = articles.length > 0 ? new Set(articles.map(a => a.source)).size : 0;
+                const keywords = Array.isArray(cluster.keywords) ? cluster.keywords.join(', ') : (cluster.keywords || '');
+
+                titleEl.textContent = '🔥 ' + (cluster.main_topic || cluster.title || 'Trending Topic');
+
+                let html = `
+                <div style="margin-bottom: 20px; padding: 20px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.3);">
+                    <div style="display: flex; gap: 30px; margin-bottom: 15px;">
+                        <div>
+                            <span style="color: #64748b; font-size: 13px; font-weight: 600;">HABER SAYISI</span>
+                            <div style="font-size: 24px; font-weight: 700; color: #667eea;">${articlesCount}</div>
+                        </div>
+                        <div>
+                            <span style="color: #64748b; font-size: 13px; font-weight: 600;">KAYNAK SAYISI</span>
+                            <div style="font-size: 24px; font-weight: 700; color: #667eea;">${sourcesCount}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <span style="color: #64748b; font-size: 13px; font-weight: 600;">ANAHTAR KELİMELER</span>
+                        <div style="color: #333; margin-top: 5px; font-weight: 500;">${keywords}</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 15px; color: #333; font-size: 18px;">📰 Tüm Haberler</h3>
+                <div style="max-height: 500px; overflow-y: auto;">
+                    ${articles.map(article => `
+                        <div class="modal-news-item">
+                            <a href="${article.link || '#'}" target="_blank">
+                                <div class="modal-news-source">${formatSourceName(article.source || 'Bilinmeyen')}</div>
+                                <div>${article.title || 'Başlık yok'}</div>
+                            </a>
+                        </div>
+                    `).join('')}
+                </div>
+                `;
+
+                contentEl.innerHTML = html;
+                modal.style.display = 'block';
+            } catch (e) {
+                console.error('Modal gösterme hatası:', e);
+            }
+        }
+
+        function closeTrendingModal() {
+            document.getElementById('trendingModal').style.display = 'none';
+        }
+
+        // Modal dışına tıklayınca kapat
+        window.onclick = function (event) {
+            const modal = document.getElementById('trendingModal');
+            if (event.target == modal) {
+                closeTrendingModal();
+            }
+        }
+
+        // Trending topic'e tıklandığında arama yap
+        function searchTrendingTopic(topic) {
+            document.getElementById('searchInput').value = topic;
+            searchGrouped();
+        }
+
+        // HTML escape için utility fonksiyon
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Enter tuşu ile arama
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchGrouped();
+            }
+        });
+
+        // Topic tag'lere tıklama eventi (event delegation kullan)
+        document.addEventListener('click', function (e) {
+            // Topic tags
+            if (e.target.closest('.topic-tag')) {
+                e.preventDefault();
+                const tag = e.target.closest('.topic-tag');
+                const topic = tag.getAttribute('data-topic');
+                if (topic) {
+                    document.getElementById('searchInput').value = topic;
+                    searchGrouped();
+                }
+            }
+        });
+
+        function toggleCluster(clusterId) {
+            const content = document.getElementById('content-' + clusterId);
+            const toggle = document.getElementById('toggle-' + clusterId);
+
+            content.classList.toggle('open');
+            toggle.classList.toggle('open');
+        }
+
+        function searchGrouped() {
+            const query = document.getElementById('searchInput').value.trim();
+
+            if (query.length < 2) {
+                alert('En az 2 karakter girin');
+                return;
+            }
+
+            // Trending topics'i gizle
+            document.getElementById('trendingSection').style.display = 'none';
+
+            // UI durumunu güncelle
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('clusters').innerHTML = '';
+            document.getElementById('resultsSummary').style.display = 'none';
+            document.getElementById('noResults').style.display = 'none';
+
+            // API çağrısı
+            fetch(`/api/search-grouped?q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+
+                    if (data.total === 0) {
+                        document.getElementById('noResults').style.display = 'block';
+                        return;
+                    }
+
+                    // Özet bilgisi
+                    document.getElementById('summaryTitle').textContent =
+                        `"${data.query}" için ${data.total} haber bulundu`;
+                    document.getElementById('summaryText').textContent =
+                        `${data.cluster_count} farklı gruba ayrıldı`;
+                    document.getElementById('resultsSummary').style.display = 'block';
+
+                    // Kümeleri göster
+                    const clustersDiv = document.getElementById('clusters');
+                    data.clusters.forEach((cluster, index) => {
+                        const clusterCard = `
+                            <div class="cluster-card">
+                                <div class="cluster-header" onclick="toggleCluster(${index})">
+                                    <div class="cluster-title">
+                                        ${index + 1}. ${cluster.title}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div class="cluster-badge">
+                                            ${cluster.count} haber
+                                        </div>
+                                        <div class="cluster-toggle" id="toggle-${index}">▼</div>
+                                    </div>
+                                </div>
+                                <div class="cluster-content" id="content-${index}">
+                                    <div class="news-list">
+                                        ${cluster.news.map(item => `
+                                            <div class="news-item">
+                                                <div class="news-title">
+                                                    <a href="${item.link}" target="_blank">${item.title}</a>
+                                                </div>
+                                                <div class="news-meta">
+                                                    <span><strong>${formatSourceName(item.source)}</strong></span>
+                                                    <span>${formatTurkishDate(item.pub_date)}</span>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        clustersDiv.innerHTML += clusterCard;
+                    });
+
+                    // İlk kümeyi otomatik aç
+                    if (data.clusters.length > 0) {
+                        toggleCluster(0);
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('noResults').style.display = 'block';
+                    console.error('Hata:', err);
+                });
+        }
+    </script>
+</body>
+
+</html>
